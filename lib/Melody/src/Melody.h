@@ -10,8 +10,8 @@ class Melody
 {
   public:
     Melody(int speakerPin, int notes[], int durations[]);
-    void StartPlayback();
-    void Update();
+    void startPlayback();
+    void update();
   private:
     int _speakerPin;
     int _notes[];
