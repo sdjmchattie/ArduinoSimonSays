@@ -9,13 +9,15 @@
 class Melody
 {
   public:
-    Melody(int speakerPin, int notes[], int durations[]);
+    Melody(int speakerPin, int notes[], int durations[], int noteCount);
+    void setTempo(float tempo); // durations per second
+    void setNoteGaps(unsigned long millis); // milliseconds between notes
     void startPlayback();
     void update();
   private:
     int _speakerPin;
-    int _notes[];
-    int _durations[];
+    int _notes[200];
+    int _durations[200];
 };
 
 #endif
