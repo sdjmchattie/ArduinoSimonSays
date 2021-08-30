@@ -19,7 +19,7 @@ int playPosition = 0;
 unsigned long previousMils = 0;
 
 int melodyLength;
-float millisPerDuration = 25.0;
+float millisPerDuration = 32.0;
 unsigned long noteGapMillis = 10.0;
 
 Melody::Melody(int speakerPin, int notes[], int durations[], int noteCount) {

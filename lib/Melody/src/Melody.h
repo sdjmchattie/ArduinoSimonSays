@@ -10,6 +10,7 @@ class Melody
 {
   public:
     Melody(int speakerPin, int notes[], int durations[], int noteCount);
+    Melody() = default;
     void setTempo(float tempo); // durations per second
     void setNoteGaps(unsigned long millis); // milliseconds between notes
     void startPlayback();
