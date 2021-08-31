@@ -59,11 +59,38 @@ void setup() {
 }
 
 void loop() {
-  int new_red_val = digitalRead(RED_BUTTON);
-  if (new_red_val != red_val) {
-    red_val = new_red_val;
-    String msg = "Button changed to ";
-    msg.concat(red_val);
-    Serial.println(msg);
+  if (digitalRead(BLUE_BUTTON) == LOW) {
+    tone(SPEAKER_PIN, 523);
+    digitalWrite(BLUE_LEDS, HIGH);
+  } else {
+    digitalWrite(BLUE_LEDS, LOW);
+  }
+
+  if (digitalRead(GREEN_BUTTON) == LOW) {
+    tone(SPEAKER_PIN, 587);
+    digitalWrite(GREEN_LEDS, HIGH);
+  } else {
+    digitalWrite(GREEN_LEDS, LOW);
+  }
+
+  if (digitalRead(YELLOW_BUTTON) == LOW) {
+    tone(SPEAKER_PIN, 659);
+    digitalWrite(YELLOW_LEDS, HIGH);
+  } else {
+    digitalWrite(YELLOW_LEDS, LOW);
+  }
+
+  if (digitalRead(RED_BUTTON) == LOW) {
+    tone(SPEAKER_PIN, 698);
+    digitalWrite(RED_LEDS, HIGH);
+  } else {
+    digitalWrite(RED_LEDS, LOW);
+  }
+
+  if (digitalRead(BLUE_BUTTON) == HIGH &&
+      digitalRead(GREEN_BUTTON) == HIGH &&
+      digitalRead(YELLOW_BUTTON) == HIGH &&
+      digitalRead(RED_BUTTON) == HIGH) {
+    noTone(SPEAKER_PIN);
   }
 }
