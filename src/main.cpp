@@ -22,6 +22,8 @@ Red                   D11
 */
 
 #include <Arduino.h>
+#include <Bounce2.h>
+#include <jled.h>
 
 #define BLUE_LEDS      3
 #define GREEN_LEDS     4
@@ -33,64 +35,80 @@ Red                   D11
 #define YELLOW_BUTTON  10
 #define RED_BUTTON     11
 
-int red_val = 1;
+JLed blueLeds = JLed(BLUE_LEDS);
+JLed greenLeds = JLed(GREEN_LEDS);
+JLed yellowLeds = JLed(YELLOW_LEDS);
+JLed redLeds = JLed(RED_LEDS);
+JLed allLeds[] = { blueLeds, greenLeds, yellowLeds, redLeds };
+
+Bounce2::Button blueButton = Bounce2::Button();
+Bounce2::Button greenButton = Bounce2::Button();
+Bounce2::Button yellowButton = Bounce2::Button();
+Bounce2::Button redButton = Bounce2::Button();
+Bounce2::Button allButtons[] = { blueButton, greenButton, yellowButton, redButton };
 
 void setup() {
   // Start serial connection to PC
   Serial.begin(9600);
 
-  // Set the mode of all the pins we're using
-  pinMode(BLUE_LEDS, OUTPUT);
-  pinMode(GREEN_LEDS, OUTPUT);
-  pinMode(YELLOW_LEDS, OUTPUT);
-  pinMode(RED_LEDS, OUTPUT);
+  // Set the speaker up
   pinMode(SPEAKER_PIN, OUTPUT);
-  pinMode(BLUE_BUTTON, INPUT_PULLUP);
-  pinMode(GREEN_BUTTON, INPUT_PULLUP);
-  pinMode(YELLOW_BUTTON, INPUT_PULLUP);
-  pinMode(RED_BUTTON, INPUT_PULLUP);
-
-  // Write initial values to outputs
-  digitalWrite(BLUE_LEDS, LOW);
-  digitalWrite(GREEN_LEDS, LOW);
-  digitalWrite(YELLOW_LEDS, LOW);
-  digitalWrite(RED_LEDS, LOW);
   noTone(SPEAKER_PIN);
+
+  // Setup button pins
+  blueButton.attach(BLUE_BUTTON, INPUT_PULLUP);
+  greenButton.attach(GREEN_BUTTON, INPUT_PULLUP);
+  yellowButton.attach(YELLOW_BUTTON, INPUT_PULLUP);
+  redButton.attach(RED_BUTTON, INPUT_PULLUP);
+
+  // Setup debounce delay
+  blueButton.interval(15);
+  greenButton.interval(15);
+  yellowButton.interval(15);
+  redButton.interval(15);
+
+  // Setup pushed state for buttons
+  blueButton.setPressedState(LOW);
+  greenButton.setPressedState(LOW);
+  yellowButton.setPressedState(LOW);
+  redButton.setPressedState(LOW);
 }
 
 void loop() {
-  if (digitalRead(BLUE_BUTTON) == LOW) {
+  for (int i = 0; i < 4; i++) {
+    allButtons[i].update();
+    allLeds[i].Update();
+  }
+
+  if (blueButton.pressed()) {
     tone(SPEAKER_PIN, 523);
-    digitalWrite(BLUE_LEDS, HIGH);
-  } else {
-    digitalWrite(BLUE_LEDS, LOW);
-  }
-
-  if (digitalRead(GREEN_BUTTON) == LOW) {
-    tone(SPEAKER_PIN, 587);
-    digitalWrite(GREEN_LEDS, HIGH);
-  } else {
-    digitalWrite(GREEN_LEDS, LOW);
-  }
-
-  if (digitalRead(YELLOW_BUTTON) == LOW) {
-    tone(SPEAKER_PIN, 659);
-    digitalWrite(YELLOW_LEDS, HIGH);
-  } else {
-    digitalWrite(YELLOW_LEDS, LOW);
-  }
-
-  if (digitalRead(RED_BUTTON) == LOW) {
-    tone(SPEAKER_PIN, 698);
-    digitalWrite(RED_LEDS, HIGH);
-  } else {
-    digitalWrite(RED_LEDS, LOW);
-  }
-
-  if (digitalRead(BLUE_BUTTON) == HIGH &&
-      digitalRead(GREEN_BUTTON) == HIGH &&
-      digitalRead(YELLOW_BUTTON) == HIGH &&
-      digitalRead(RED_BUTTON) == HIGH) {
+    blueLeds.On();
+  } else if (blueButton.released()) {
     noTone(SPEAKER_PIN);
+    blueLeds.Off();
+  }
+
+  if (greenButton.pressed()) {
+    tone(SPEAKER_PIN, 587);
+    greenLeds.On();
+  } else if (greenButton.released()) {
+    noTone(SPEAKER_PIN);
+    greenLeds.Off();
+  }
+
+  if (yellowButton.pressed()) {
+    tone(SPEAKER_PIN, 659);
+    yellowLeds.On();
+  } else if (yellowButton.released()) {
+    noTone(SPEAKER_PIN);
+    yellowLeds.Off();
+  }
+
+  if (redButton.pressed()) {
+    tone(SPEAKER_PIN, 698);
+    redLeds.On();
+  } else if (redButton.released()) {
+    noTone(SPEAKER_PIN);
+    redLeds.Off();
   }
 }
