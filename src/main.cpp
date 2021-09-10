@@ -39,13 +39,13 @@ JLed blueLeds = JLed(BLUE_LEDS);
 JLed greenLeds = JLed(GREEN_LEDS);
 JLed yellowLeds = JLed(YELLOW_LEDS);
 JLed redLeds = JLed(RED_LEDS);
-JLed allLeds[] = { blueLeds, greenLeds, yellowLeds, redLeds };
 
 Bounce2::Button blueButton = Bounce2::Button();
 Bounce2::Button greenButton = Bounce2::Button();
 Bounce2::Button yellowButton = Bounce2::Button();
 Bounce2::Button redButton = Bounce2::Button();
-Bounce2::Button allButtons[] = { blueButton, greenButton, yellowButton, redButton };
+
+void doUpdates();
 
 void setup() {
   // Start serial connection to PC
@@ -75,10 +75,7 @@ void setup() {
 }
 
 void loop() {
-  for (int i = 0; i < 4; i++) {
-    allButtons[i].update();
-    allLeds[i].Update();
-  }
+  doUpdates();
 
   if (blueButton.pressed()) {
     tone(SPEAKER_PIN, 523);
@@ -111,4 +108,15 @@ void loop() {
     noTone(SPEAKER_PIN);
     redLeds.Off();
   }
+}
+
+void doUpdates() {
+  blueButton.update();
+  greenButton.update();
+  yellowButton.update();
+  redButton.update();
+  blueLeds.Update();
+  greenLeds.Update();
+  yellowLeds.Update();
+  redLeds.Update();
 }
