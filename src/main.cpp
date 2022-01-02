@@ -35,6 +35,22 @@ Green                 D4
 #define RED_BUTTON     8
 #define GREEN_BUTTON   4
 
+enum State {
+  INITIAL,
+  CHOOSE_DIFFICULTY,
+};
+
+State state = INITIAL;
+
+enum Difficulty {
+  NONE,
+  EASY,
+  MEDIUM,
+  HARD,
+};
+
+Difficulty difficulty = NONE;
+
 JLed blueLeds = JLed(BLUE_LEDS);
 JLed yellowLeds = JLed(YELLOW_LEDS);
 JLed redLeds = JLed(RED_LEDS);
@@ -45,44 +61,46 @@ Bounce2::Button greenButton = Bounce2::Button();
 Bounce2::Button yellowButton = Bounce2::Button();
 Bounce2::Button redButton = Bounce2::Button();
 
-void doUpdates();
+void doUpdates() {
+  blueButton.update();
+  yellowButton.update();
+  redButton.update();
+  greenButton.update();
+  blueLeds.Update();
+  yellowLeds.Update();
+  redLeds.Update();
+  greenLeds.Update();
+}
 
-void setup() {
-  // Start serial connection to PC
-  Serial.begin(9600);
-
-  // Set the speaker up
-  pinMode(SPEAKER_PIN, OUTPUT);
-  noTone(SPEAKER_PIN);
-
-  // Setup button pins
-  blueButton.attach(BLUE_BUTTON, INPUT_PULLUP);
-  yellowButton.attach(YELLOW_BUTTON, INPUT_PULLUP);
-  redButton.attach(RED_BUTTON, INPUT_PULLUP);
-  greenButton.attach(GREEN_BUTTON, INPUT_PULLUP);
-
-  // Setup debounce delay
-  blueButton.interval(15);
-  yellowButton.interval(15);
-  redButton.interval(15);
-  greenButton.interval(15);
-
-  // Setup pushed state for buttons
-  blueButton.setPressedState(LOW);
-  yellowButton.setPressedState(LOW);
-  redButton.setPressedState(LOW);
-  greenButton.setPressedState(LOW);
-
+void setDifficulty(Difficulty newDifficulty) {
   blueLeds.Breathe(1000).Forever();
   yellowLeds.Breathe(1000).Forever();
   redLeds.Breathe(1000).Forever();
-  greenLeds.Breathe(1000).Forever();
+  greenLeds.Off();
+
+  difficulty = newDifficulty;
+  switch (difficulty) {
+    case NONE:
+      // Nothing special to do for NONE case.
+      break;
+    case EASY:
+      blueLeds.Breathe(200).Forever();
+      break;
+    case MEDIUM:
+      yellowLeds.Breathe(200).Forever();
+      break;
+    case HARD:
+      redLeds.Breathe(200).Forever();
+      break;
+  }
 }
 
-void loop() {
-  doUpdates();
+void chooseDifficulty() {
 
-  if (blueButton.pressed()) {
+}
+
+void inputButtonSequece() {
+    if (blueButton.pressed()) {
     tone(SPEAKER_PIN, 523);
     blueLeds.On();
   } else if (blueButton.released()) {
@@ -115,13 +133,43 @@ void loop() {
   }
 }
 
-void doUpdates() {
-  blueButton.update();
-  yellowButton.update();
-  redButton.update();
-  greenButton.update();
-  blueLeds.Update();
-  yellowLeds.Update();
-  redLeds.Update();
-  greenLeds.Update();
+void setup() {
+  // Start serial connection to PC
+  Serial.begin(9600);
+
+  // Set the speaker up
+  pinMode(SPEAKER_PIN, OUTPUT);
+  noTone(SPEAKER_PIN);
+
+  // Setup button pins
+  blueButton.attach(BLUE_BUTTON, INPUT_PULLUP);
+  yellowButton.attach(YELLOW_BUTTON, INPUT_PULLUP);
+  redButton.attach(RED_BUTTON, INPUT_PULLUP);
+  greenButton.attach(GREEN_BUTTON, INPUT_PULLUP);
+
+  // Setup debounce delay
+  blueButton.interval(15);
+  yellowButton.interval(15);
+  redButton.interval(15);
+  greenButton.interval(15);
+
+  // Setup pushed state for buttons
+  blueButton.setPressedState(LOW);
+  yellowButton.setPressedState(LOW);
+  redButton.setPressedState(LOW);
+  greenButton.setPressedState(LOW);
+}
+
+void loop() {
+  doUpdates();
+
+  switch (state) {
+    case INITIAL:
+      setDifficulty(NONE);
+      state = CHOOSE_DIFFICULTY;
+      break;
+    case CHOOSE_DIFFICULTY:
+      chooseDifficulty();
+      break;
+  }
 }
