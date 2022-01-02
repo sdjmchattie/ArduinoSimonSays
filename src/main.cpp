@@ -10,15 +10,15 @@ Passive Speaker       ARDUINO
 
 LED Transistors (PWM) ARDUINO
 Blue                  D3
-Green                 D5
 Yellow                D6
 Red                   D9
+Green                 D5
 
 Arcade Buttons        ARDUINO
 Blue                  D2
-Green                 D4
 Yellow                D7
 Red                   D8
+Green                 D4
 */
 
 #include <Arduino.h>
