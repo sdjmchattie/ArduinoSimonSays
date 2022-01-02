@@ -6,19 +6,19 @@ CONNECTIONS:
 
 Passive Speaker       ARDUINO
 -                     GND
-+                     D7
++                     D10
 
-LED Transisitors      ARDUINO
+LED Transistors (PWM) ARDUINO
 Blue                  D3
-Green                 D4
-Yellow                D5
-Red                   D6
+Green                 D5
+Yellow                D6
+Red                   D9
 
 Arcade Buttons        ARDUINO
-Blue                  D8
-Green                 D9
-Yellow                D10
-Red                   D11
+Blue                  D2
+Green                 D4
+Yellow                D7
+Red                   D8
 */
 
 #include <Arduino.h>
@@ -26,19 +26,19 @@ Red                   D11
 #include <jled.h>
 
 #define BLUE_LEDS      3
-#define GREEN_LEDS     4
-#define YELLOW_LEDS    5
-#define RED_LEDS       6
-#define SPEAKER_PIN    7
-#define BLUE_BUTTON    8
-#define GREEN_BUTTON   9
-#define YELLOW_BUTTON  10
-#define RED_BUTTON     11
+#define YELLOW_LEDS    6
+#define RED_LEDS       9
+#define GREEN_LEDS     5
+#define SPEAKER_PIN    10
+#define BLUE_BUTTON    2
+#define YELLOW_BUTTON  7
+#define RED_BUTTON     8
+#define GREEN_BUTTON   4
 
 JLed blueLeds = JLed(BLUE_LEDS);
-JLed greenLeds = JLed(GREEN_LEDS);
 JLed yellowLeds = JLed(YELLOW_LEDS);
 JLed redLeds = JLed(RED_LEDS);
+JLed greenLeds = JLed(GREEN_LEDS);
 
 Bounce2::Button blueButton = Bounce2::Button();
 Bounce2::Button greenButton = Bounce2::Button();
@@ -57,21 +57,26 @@ void setup() {
 
   // Setup button pins
   blueButton.attach(BLUE_BUTTON, INPUT_PULLUP);
-  greenButton.attach(GREEN_BUTTON, INPUT_PULLUP);
   yellowButton.attach(YELLOW_BUTTON, INPUT_PULLUP);
   redButton.attach(RED_BUTTON, INPUT_PULLUP);
+  greenButton.attach(GREEN_BUTTON, INPUT_PULLUP);
 
   // Setup debounce delay
   blueButton.interval(15);
-  greenButton.interval(15);
   yellowButton.interval(15);
   redButton.interval(15);
+  greenButton.interval(15);
 
   // Setup pushed state for buttons
   blueButton.setPressedState(LOW);
-  greenButton.setPressedState(LOW);
   yellowButton.setPressedState(LOW);
   redButton.setPressedState(LOW);
+  greenButton.setPressedState(LOW);
+
+  blueLeds.Breathe(1000).Forever();
+  yellowLeds.Breathe(1000).Forever();
+  redLeds.Breathe(1000).Forever();
+  greenLeds.Breathe(1000).Forever();
 }
 
 void loop() {
@@ -112,11 +117,11 @@ void loop() {
 
 void doUpdates() {
   blueButton.update();
-  greenButton.update();
   yellowButton.update();
   redButton.update();
+  greenButton.update();
   blueLeds.Update();
-  greenLeds.Update();
   yellowLeds.Update();
   redLeds.Update();
+  greenLeds.Update();
 }
