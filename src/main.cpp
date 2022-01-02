@@ -25,24 +25,26 @@ Green                 D4
 #include <Bounce2.h>
 #include <jled.h>
 
-#define BLUE_LEDS      3
-#define YELLOW_LEDS    6
-#define RED_LEDS       9
-#define GREEN_LEDS     5
-#define SPEAKER_PIN    10
-#define BLUE_BUTTON    2
-#define YELLOW_BUTTON  7
-#define RED_BUTTON     8
-#define GREEN_BUTTON   4
+#define BLUE_LEDS 3
+#define YELLOW_LEDS 6
+#define RED_LEDS 9
+#define GREEN_LEDS 5
+#define SPEAKER_PIN 10
+#define BLUE_BUTTON 2
+#define YELLOW_BUTTON 7
+#define RED_BUTTON 8
+#define GREEN_BUTTON 4
 
-enum State {
+enum State
+{
   INITIAL,
   CHOOSE_DIFFICULTY,
 };
 
 State state = INITIAL;
 
-enum Difficulty {
+enum Difficulty
+{
   NONE,
   EASY,
   MEDIUM,
@@ -61,7 +63,8 @@ Bounce2::Button greenButton = Bounce2::Button();
 Bounce2::Button yellowButton = Bounce2::Button();
 Bounce2::Button redButton = Bounce2::Button();
 
-void doUpdates() {
+void doUpdates()
+{
   blueButton.update();
   yellowButton.update();
   redButton.update();
@@ -72,68 +75,84 @@ void doUpdates() {
   greenLeds.Update();
 }
 
-void setDifficulty(Difficulty newDifficulty) {
+void setDifficulty(Difficulty newDifficulty)
+{
   blueLeds.Breathe(1000).Forever();
   yellowLeds.Breathe(1000).Forever();
   redLeds.Breathe(1000).Forever();
   greenLeds.Off();
 
   difficulty = newDifficulty;
-  switch (difficulty) {
-    case NONE:
-      // Nothing special to do for NONE case.
-      break;
-    case EASY:
-      blueLeds.Breathe(200).Forever();
-      break;
-    case MEDIUM:
-      yellowLeds.Breathe(200).Forever();
-      break;
-    case HARD:
-      redLeds.Breathe(200).Forever();
-      break;
+  switch (difficulty)
+  {
+  case NONE:
+    // Nothing special to do for NONE case.
+    break;
+  case EASY:
+    blueLeds.Breathe(200).Forever();
+    break;
+  case MEDIUM:
+    yellowLeds.Breathe(200).Forever();
+    break;
+  case HARD:
+    redLeds.Breathe(200).Forever();
+    break;
   }
 }
 
-void chooseDifficulty() {
-
+void chooseDifficulty()
+{
 }
 
-void inputButtonSequece() {
-    if (blueButton.pressed()) {
+void inputButtonSequece()
+{
+  if (blueButton.pressed())
+  {
     tone(SPEAKER_PIN, 523);
     blueLeds.On();
-  } else if (blueButton.released()) {
+  }
+  else if (blueButton.released())
+  {
     noTone(SPEAKER_PIN);
     blueLeds.Off();
   }
 
-  if (greenButton.pressed()) {
+  if (greenButton.pressed())
+  {
     tone(SPEAKER_PIN, 587);
     greenLeds.On();
-  } else if (greenButton.released()) {
+  }
+  else if (greenButton.released())
+  {
     noTone(SPEAKER_PIN);
     greenLeds.Off();
   }
 
-  if (yellowButton.pressed()) {
+  if (yellowButton.pressed())
+  {
     tone(SPEAKER_PIN, 659);
     yellowLeds.On();
-  } else if (yellowButton.released()) {
+  }
+  else if (yellowButton.released())
+  {
     noTone(SPEAKER_PIN);
     yellowLeds.Off();
   }
 
-  if (redButton.pressed()) {
+  if (redButton.pressed())
+  {
     tone(SPEAKER_PIN, 698);
     redLeds.On();
-  } else if (redButton.released()) {
+  }
+  else if (redButton.released())
+  {
     noTone(SPEAKER_PIN);
     redLeds.Off();
   }
 }
 
-void setup() {
+void setup()
+{
   // Start serial connection to PC
   Serial.begin(9600);
 
@@ -160,16 +179,18 @@ void setup() {
   greenButton.setPressedState(LOW);
 }
 
-void loop() {
+void loop()
+{
   doUpdates();
 
-  switch (state) {
-    case INITIAL:
-      setDifficulty(NONE);
-      state = CHOOSE_DIFFICULTY;
-      break;
-    case CHOOSE_DIFFICULTY:
-      chooseDifficulty();
-      break;
+  switch (state)
+  {
+  case INITIAL:
+    setDifficulty(NONE);
+    state = CHOOSE_DIFFICULTY;
+    break;
+  case CHOOSE_DIFFICULTY:
+    chooseDifficulty();
+    break;
   }
 }
