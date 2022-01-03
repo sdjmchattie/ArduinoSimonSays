@@ -25,6 +25,8 @@ Green                 D4
 #include <Bounce2.h>
 #include <jled.h>
 
+#include "led_multi_flash.h"
+
 #define BLUE_LEDS 3
 #define YELLOW_LEDS 6
 #define RED_LEDS 9
@@ -37,21 +39,23 @@ Green                 D4
 
 enum State
 {
-  INITIAL,
-  CHOOSE_DIFFICULTY,
+  Initial,
+  ChooseDifficulty,
 };
 
-State state = INITIAL;
+State state = Initial;
 
 enum Difficulty
 {
-  NONE,
-  EASY,
-  MEDIUM,
-  HARD,
+  None,
+  Easy,
+  Medium,
+  Hard,
 };
 
-Difficulty difficulty = NONE;
+Difficulty difficulty = None;
+
+LedMultiFlash multiFlash(3);
 
 JLed blueLeds = JLed(BLUE_LEDS);
 JLed yellowLeds = JLed(YELLOW_LEDS);
@@ -81,20 +85,22 @@ void setDifficulty(Difficulty newDifficulty)
   yellowLeds.Breathe(2000).Forever();
   redLeds.Breathe(2000).Forever();
   greenLeds.Off();
+  greenLeds.UserFunc(&multiFlash).Forever().DelayBefore(750).DelayAfter(1500);
 
   difficulty = newDifficulty;
   switch (difficulty)
   {
-  case NONE:
-    // Nothing special to do for NONE case.
+  case None:
+    // Turn off the flash on the green button
+    greenLeds.Stop();
     break;
-  case EASY:
+  case Easy:
     blueLeds.Breathe(400).Forever();
     break;
-  case MEDIUM:
+  case Medium:
     yellowLeds.Breathe(400).Forever();
     break;
-  case HARD:
+  case Hard:
     redLeds.Breathe(400).Forever();
     break;
   }
@@ -102,17 +108,17 @@ void setDifficulty(Difficulty newDifficulty)
 
 void chooseDifficulty()
 {
-  if (blueButton.pressed())
+  if (blueButton.pressed() && difficulty != Easy)
   {
-    setDifficulty(EASY);
+    setDifficulty(Easy);
   }
-  else if (yellowButton.pressed())
+  else if (yellowButton.pressed() && difficulty != Medium)
   {
-    setDifficulty(MEDIUM);
+    setDifficulty(Medium);
   }
-  else if (redButton.pressed())
+  else if (redButton.pressed() && difficulty != Hard)
   {
-    setDifficulty(HARD);
+    setDifficulty(Hard);
   }
 }
 
@@ -197,11 +203,11 @@ void loop()
 
   switch (state)
   {
-  case INITIAL:
-    setDifficulty(NONE);
-    state = CHOOSE_DIFFICULTY;
+  case Initial:
+    setDifficulty(None);
+    state = ChooseDifficulty;
     break;
-  case CHOOSE_DIFFICULTY:
+  case ChooseDifficulty:
     chooseDifficulty();
     break;
   }
