@@ -85,7 +85,7 @@ void setDifficulty(Difficulty newDifficulty)
   yellowLeds.Breathe(2000).Forever();
   redLeds.Breathe(2000).Forever();
   greenLeds.Off();
-  greenLeds.UserFunc(&multiFlash).Forever().DelayBefore(750).DelayAfter(1500);
+  greenLeds.UserFunc(&multiFlash).Forever().DelayBefore(750).DelayAfter(1400);
 
   difficulty = newDifficulty;
   switch (difficulty)
