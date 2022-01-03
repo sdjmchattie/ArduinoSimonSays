@@ -6,7 +6,7 @@ CONNECTIONS:
 
 Passive Speaker       ARDUINO
 -                     GND
-+                     D10
++                     D12
 
 LED Transistors (PWM) ARDUINO
 Blue                  D3
@@ -27,15 +27,22 @@ Green                 D4
 
 #include "led_multi_flash.h"
 
+#define SPEAKER_PIN 12
+
 #define BLUE_LEDS 3
 #define YELLOW_LEDS 6
 #define RED_LEDS 9
 #define GREEN_LEDS 5
-#define SPEAKER_PIN 10
+
 #define BLUE_BUTTON 2
 #define YELLOW_BUTTON 7
 #define RED_BUTTON 8
 #define GREEN_BUTTON 4
+
+#define BLUE_FREQ 523
+#define YELLOW_FREQ 587
+#define RED_FREQ 659
+#define GREEN_FREQ 698
 
 enum State
 {
@@ -43,6 +50,7 @@ enum State
   ChooseDifficulty,
   StartGame,
   PlaySequence,
+  InputSequence,
 };
 
 State state = Initial;
@@ -65,13 +73,23 @@ JLed redLeds = JLed(RED_LEDS);
 JLed greenLeds = JLed(GREEN_LEDS);
 
 Bounce2::Button blueButton = Bounce2::Button();
-Bounce2::Button greenButton = Bounce2::Button();
 Bounce2::Button yellowButton = Bounce2::Button();
 Bounce2::Button redButton = Bounce2::Button();
+Bounce2::Button greenButton = Bounce2::Button();
 
 char colours[4] = {'b', 'y', 'r', 'g'};
 String sequence;
+
+enum PlaySequenceState
+{
+  StartNext,
+  Playing,
+  Paused
+};
+
+PlaySequenceState playSequenceState;
 uint8_t seqIndex;
+unsigned long previousMils;
 
 void doUpdates()
 {
@@ -83,6 +101,14 @@ void doUpdates()
   yellowLeds.Update();
   redLeds.Update();
   greenLeds.Update();
+}
+
+void resetLeds()
+{
+  blueLeds.Off();
+  yellowLeds.Off();
+  redLeds.Off();
+  greenLeds.Off().DelayBefore(0).DelayAfter(0);
 }
 
 void setDifficulty(Difficulty newDifficulty)
@@ -128,10 +154,7 @@ void chooseDifficulty()
   }
   else if (greenButton.pressed() && difficulty != None)
   {
-    blueLeds.Off();
-    yellowLeds.Off();
-    redLeds.Off();
-    greenLeds.Off();
+    resetLeds();
     state = StartGame;
   }
 }
@@ -154,6 +177,7 @@ void generateSequence()
   }
 
   sequence = "";
+  srand(millis());
   for (int i = 0; i < length; i++)
   {
     sequence = sequence + colours[rand() % 4];
@@ -162,51 +186,57 @@ void generateSequence()
   seqIndex = 0;
 }
 
-void inputButtonSequence()
+bool playSequence()
 {
-  if (blueButton.pressed())
+  unsigned long mils = millis();
+
+  switch (playSequenceState)
   {
-    tone(SPEAKER_PIN, 523);
-    blueLeds.On();
-  }
-  else if (blueButton.released())
-  {
-    noTone(SPEAKER_PIN);
-    blueLeds.Off();
+  case StartNext:
+    switch (sequence[seqIndex])
+    {
+    case 'b':
+      tone(SPEAKER_PIN, BLUE_FREQ);
+      blueLeds.On();
+      break;
+    case 'y':
+      tone(SPEAKER_PIN, YELLOW_FREQ);
+      yellowLeds.On();
+      break;
+    case 'r':
+      tone(SPEAKER_PIN, RED_FREQ);
+      redLeds.On();
+      break;
+    case 'g':
+      tone(SPEAKER_PIN, GREEN_FREQ);
+      greenLeds.On();
+      break;
+    }
+
+    previousMils = mils;
+    playSequenceState = Playing;
+    break;
+  case Playing:
+    if (mils - previousMils >= 750)
+    {
+      noTone(SPEAKER_PIN);
+      resetLeds();
+      previousMils = mils;
+      playSequenceState = Paused;
+    }
+    break;
+  case Paused:
+    if (mils - previousMils >= 200)
+    {
+      seqIndex++;
+      previousMils = mils;
+      playSequenceState = StartNext;
+      return seqIndex >= sequence.length();
+    }
+    break;
   }
 
-  if (greenButton.pressed())
-  {
-    tone(SPEAKER_PIN, 587);
-    greenLeds.On();
-  }
-  else if (greenButton.released())
-  {
-    noTone(SPEAKER_PIN);
-    greenLeds.Off();
-  }
-
-  if (yellowButton.pressed())
-  {
-    tone(SPEAKER_PIN, 659);
-    yellowLeds.On();
-  }
-  else if (yellowButton.released())
-  {
-    noTone(SPEAKER_PIN);
-    yellowLeds.Off();
-  }
-
-  if (redButton.pressed())
-  {
-    tone(SPEAKER_PIN, 698);
-    redLeds.On();
-  }
-  else if (redButton.released())
-  {
-    noTone(SPEAKER_PIN);
-    redLeds.Off();
-  }
+  return false;
 }
 
 void setup()
@@ -252,9 +282,17 @@ void loop()
     break;
   case StartGame:
     generateSequence();
+    seqIndex = 0;
+    playSequenceState = StartNext;
     state = PlaySequence;
     break;
   case PlaySequence:
+    if (playSequence())
+    {
+      state = InputSequence;
+    }
+    break;
+  case InputSequence:
     break;
   }
 }
