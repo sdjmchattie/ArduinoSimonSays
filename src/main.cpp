@@ -39,10 +39,10 @@ Green                 D4
 #define RED_BUTTON 8
 #define GREEN_BUTTON 4
 
-#define BLUE_FREQ 523
-#define YELLOW_FREQ 587
-#define RED_FREQ 659
-#define GREEN_FREQ 698
+#define BLUE_FREQ 349
+#define YELLOW_FREQ 262
+#define RED_FREQ 233
+#define GREEN_FREQ 208
 
 enum State
 {
