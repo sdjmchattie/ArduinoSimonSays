@@ -89,6 +89,7 @@ enum PlaySequenceState
 
 PlaySequenceState playSequenceState;
 uint8_t seqIndex;
+uint8_t playLength;
 unsigned long previousMils;
 
 void doUpdates()
@@ -251,7 +252,7 @@ bool playSequence()
       seqIndex++;
       previousMils = mils;
       playSequenceState = StartNext;
-      return seqIndex >= sequence.length();
+      return seqIndex == playLength;
     }
     break;
   }
@@ -303,6 +304,7 @@ void loop()
   case StartGame:
     generateSequence();
     seqIndex = 0;
+    playLength = 1;
     playSequenceState = StartNext;
     state = PlaySequence;
     break;
