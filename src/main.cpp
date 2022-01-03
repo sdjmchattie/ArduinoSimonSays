@@ -186,6 +186,26 @@ void generateSequence()
   seqIndex = 0;
 }
 
+unsigned int noteLength()
+{
+  if (playLength < 5)
+  {
+    return 500;
+  }
+  else if (playLength < 10)
+  {
+    return 400;
+  }
+  else if (playLength < 15)
+  {
+    return 300;
+  }
+  else
+  {
+    return 200;
+  }
+}
+
 bool playSequence()
 {
   unsigned long mils = millis();
@@ -217,7 +237,7 @@ bool playSequence()
     playSequenceState = Playing;
     break;
   case Playing:
-    if (mils - previousMils >= 750)
+    if (mils - previousMils >= noteLength())
     {
       noTone(SPEAKER_PIN);
       resetLeds();
@@ -226,7 +246,7 @@ bool playSequence()
     }
     break;
   case Paused:
-    if (mils - previousMils >= 200)
+    if (mils - previousMils >= noteLength() / 5)
     {
       seqIndex++;
       previousMils = mils;
