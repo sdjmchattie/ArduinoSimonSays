@@ -7,7 +7,15 @@
 
 uint8_t LedMultiFlash::Eval(uint32_t t) const
 {
-  return 255 * (1 - ((t + 1) / speed) % 2);
+  if (t == Period())
+  {
+    return 0;
+  }
+
+  return 255 * (1 - (t / speed) % 2);
 }
 
-uint16_t LedMultiFlash::Period() const { return (flashCount * 2 - 1) * speed; }
+uint16_t LedMultiFlash::Period() const
+{
+  return (flashCount * 2 - 1) * speed;
+}

@@ -95,13 +95,13 @@ void setDifficulty(Difficulty newDifficulty)
     greenLeds.Stop();
     break;
   case Easy:
-    blueLeds.Breathe(400).Forever();
+    blueLeds.On();
     break;
   case Medium:
-    yellowLeds.Breathe(400).Forever();
+    yellowLeds.On();
     break;
   case Hard:
-    redLeds.Breathe(400).Forever();
+    redLeds.On();
     break;
   }
 }
