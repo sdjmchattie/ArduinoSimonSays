@@ -41,6 +41,8 @@ enum State
 {
   Initial,
   ChooseDifficulty,
+  StartGame,
+  PlaySequence,
 };
 
 State state = Initial;
@@ -66,6 +68,10 @@ Bounce2::Button blueButton = Bounce2::Button();
 Bounce2::Button greenButton = Bounce2::Button();
 Bounce2::Button yellowButton = Bounce2::Button();
 Bounce2::Button redButton = Bounce2::Button();
+
+char colours[4] = {'b', 'y', 'r', 'g'};
+String sequence;
+uint8_t seqIndex;
 
 void doUpdates()
 {
@@ -120,9 +126,43 @@ void chooseDifficulty()
   {
     setDifficulty(Hard);
   }
+  else if (greenButton.pressed() && difficulty != None)
+  {
+    blueLeds.Off();
+    yellowLeds.Off();
+    redLeds.Off();
+    greenLeds.Off();
+    state = StartGame;
+  }
 }
 
-void inputButtonSequece()
+void generateSequence()
+{
+  int length;
+  switch (difficulty)
+  {
+  case None:
+  case Easy:
+    length = 8;
+    break;
+  case Medium:
+    length = 16;
+    break;
+  case Hard:
+    length = 24;
+    break;
+  }
+
+  sequence = "";
+  for (int i = 0; i < length; i++)
+  {
+    sequence = sequence + colours[rand() % 4];
+  }
+
+  seqIndex = 0;
+}
+
+void inputButtonSequence()
 {
   if (blueButton.pressed())
   {
@@ -209,6 +249,12 @@ void loop()
     break;
   case ChooseDifficulty:
     chooseDifficulty();
+    break;
+  case StartGame:
+    generateSequence();
+    state = PlaySequence;
+    break;
+  case PlaySequence:
     break;
   }
 }
