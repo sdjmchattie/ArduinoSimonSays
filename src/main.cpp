@@ -77,9 +77,9 @@ void doUpdates()
 
 void setDifficulty(Difficulty newDifficulty)
 {
-  blueLeds.Breathe(1000).Forever();
-  yellowLeds.Breathe(1000).Forever();
-  redLeds.Breathe(1000).Forever();
+  blueLeds.Breathe(2000).Forever();
+  yellowLeds.Breathe(2000).Forever();
+  redLeds.Breathe(2000).Forever();
   greenLeds.Off();
 
   difficulty = newDifficulty;
@@ -89,19 +89,31 @@ void setDifficulty(Difficulty newDifficulty)
     // Nothing special to do for NONE case.
     break;
   case EASY:
-    blueLeds.Breathe(200).Forever();
+    blueLeds.Breathe(400).Forever();
     break;
   case MEDIUM:
-    yellowLeds.Breathe(200).Forever();
+    yellowLeds.Breathe(400).Forever();
     break;
   case HARD:
-    redLeds.Breathe(200).Forever();
+    redLeds.Breathe(400).Forever();
     break;
   }
 }
 
 void chooseDifficulty()
 {
+  if (blueButton.pressed())
+  {
+    setDifficulty(EASY);
+  }
+  else if (yellowButton.pressed())
+  {
+    setDifficulty(MEDIUM);
+  }
+  else if (redButton.pressed())
+  {
+    setDifficulty(HARD);
+  }
 }
 
 void inputButtonSequece()
