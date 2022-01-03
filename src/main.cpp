@@ -51,6 +51,8 @@ enum State
   StartGame,
   PlaySequence,
   InputSequence,
+  Win,
+  Fail
 };
 
 State state = Initial;
@@ -207,7 +209,7 @@ unsigned int noteLength()
   }
 }
 
-bool playSequence()
+void playSequence()
 {
   unsigned long mils = millis();
 
@@ -252,12 +254,20 @@ bool playSequence()
       seqIndex++;
       previousMils = mils;
       playSequenceState = StartNext;
-      return seqIndex == playLength;
     }
     break;
   }
+}
 
-  return false;
+void inputSequence()
+{
+  unsigned long mils = millis();
+
+  if (mils - previousMils >= 5000)
+  {
+    state = Fail;
+    return;
+  }
 }
 
 void setup()
@@ -309,12 +319,23 @@ void loop()
     state = PlaySequence;
     break;
   case PlaySequence:
-    if (playSequence())
+    playSequence();
+    if (seqIndex == playLength)
     {
+      seqIndex = 0;
       state = InputSequence;
     }
     break;
   case InputSequence:
+    inputSequence();
+    break;
+  case Win:
+    break;
+  case Fail:
+    blueLeds.On();
+    yellowLeds.On();
+    redLeds.On();
+    greenLeds.On();
     break;
   }
 }
