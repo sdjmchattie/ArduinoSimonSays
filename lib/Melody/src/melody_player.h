@@ -11,6 +11,7 @@
 enum MelodyChoice
 {
   SuperMarioFanfare,
+  SuperMarioGameOver,
 };
 
 class MelodyPlayer

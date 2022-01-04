@@ -120,9 +120,9 @@ void doUpdates()
 
 void resetLeds()
 {
-  blueLeds.Off();
-  yellowLeds.Off();
-  redLeds.Off();
+  blueLeds.Off().DelayBefore(0).DelayAfter(0);
+  yellowLeds.Off().DelayBefore(0).DelayAfter(0);
+  redLeds.Off().DelayBefore(0).DelayAfter(0);
   greenLeds.Off().DelayBefore(0).DelayAfter(0);
 }
 
@@ -459,13 +459,18 @@ void loop()
     }
     break;
   case Win:
+    blueLeds.Blink(100, 300);
+    yellowLeds.Blink(100, 300).DelayBefore(100);
+    greenLeds.Blink(100, 300).DelayBefore(200);
+    redLeds.Blink(100, 300).DelayBefore(300);
     playMelody(SuperMarioFanfare, 1000, Initial);
     break;
   case Fail:
-    blueLeds.On();
-    yellowLeds.On();
-    redLeds.On();
-    greenLeds.On();
+    blueLeds.Blink(200, 300);
+    yellowLeds.Blink(200, 300);
+    redLeds.Blink(200, 300);
+    greenLeds.Blink(200, 300);
+    playMelody(SuperMarioGameOver, 1000, Initial);
     break;
   }
 }
