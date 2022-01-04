@@ -90,6 +90,7 @@ enum PlaySequenceState
 };
 
 PlaySequenceState playSequenceState;
+
 uint8_t seqIndex;
 uint8_t playLength;
 unsigned long previousMils;
@@ -259,6 +260,14 @@ void playSequence()
   }
 }
 
+int buttonsDown()
+{
+  return (blueButton.isPressed() ? 1 : 0) +
+         (yellowButton.isPressed() ? 1 : 0) +
+         (redButton.isPressed() ? 1 : 0) +
+         (greenButton.isPressed() ? 1 : 0);
+}
+
 void inputSequence()
 {
   unsigned long mils = millis();
@@ -267,6 +276,70 @@ void inputSequence()
   {
     state = Fail;
     return;
+  }
+
+  if (buttonsDown() == 1)
+  {
+    if (blueButton.pressed())
+    {
+      if (sequence[seqIndex] == 'b')
+      {
+        tone(SPEAKER_PIN, BLUE_FREQ);
+        blueLeds.On();
+      }
+      else
+      {
+        state = Fail;
+      }
+    }
+    if (yellowButton.pressed())
+    {
+      if (sequence[seqIndex] == 'y')
+      {
+        tone(SPEAKER_PIN, YELLOW_FREQ);
+        yellowLeds.On();
+      }
+      else
+      {
+        state = Fail;
+      }
+    }
+    if (redButton.pressed())
+    {
+      if (sequence[seqIndex] == 'r')
+      {
+        tone(SPEAKER_PIN, RED_FREQ);
+        redLeds.On();
+      }
+      else
+      {
+        state = Fail;
+      }
+    }
+    if (greenButton.pressed())
+    {
+      if (sequence[seqIndex] == 'g')
+      {
+        tone(SPEAKER_PIN, GREEN_FREQ);
+        greenLeds.On();
+      }
+      else
+      {
+        state = Fail;
+      }
+    }
+  }
+
+  if (buttonsDown() == 0 &&
+      (blueButton.released() ||
+       yellowButton.released() ||
+       redButton.released() ||
+       greenButton.released()))
+  {
+    noTone(SPEAKER_PIN);
+    resetLeds();
+    previousMils = mils;
+    seqIndex++;
   }
 }
 
@@ -328,6 +401,12 @@ void loop()
     break;
   case InputSequence:
     inputSequence();
+    if (seqIndex == playLength)
+    {
+      playLength++;
+      seqIndex = 0;
+      state = playLength > sequence.length() ? Win : PlaySequence;
+    }
     break;
   case Win:
     break;
