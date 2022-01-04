@@ -46,6 +46,7 @@ Green                 D4
 
 enum State
 {
+  Pause,
   Initial,
   ChooseDifficulty,
   StartGame,
@@ -95,6 +96,9 @@ uint8_t seqIndex;
 uint8_t playLength;
 unsigned long previousMils;
 
+State stateAfterPause = Initial;
+unsigned long pauseMils = 0;
+
 void doUpdates()
 {
   blueButton.update();
@@ -113,6 +117,14 @@ void resetLeds()
   yellowLeds.Off();
   redLeds.Off();
   greenLeds.Off().DelayBefore(0).DelayAfter(0);
+}
+
+void pause(unsigned long mils, State stateAfter)
+{
+  previousMils = millis();
+  stateAfterPause = stateAfter;
+  pauseMils = mils;
+  state = Pause;
 }
 
 void setDifficulty(Difficulty newDifficulty)
@@ -159,7 +171,7 @@ void chooseDifficulty()
   else if (greenButton.pressed() && difficulty != None)
   {
     resetLeds();
-    state = StartGame;
+    pause(1000, StartGame);
   }
 }
 
@@ -381,6 +393,12 @@ void loop()
     setDifficulty(None);
     state = ChooseDifficulty;
     break;
+  case Pause:
+    if (millis() - previousMils >= pauseMils)
+    {
+      state = stateAfterPause;
+    }
+    break;
   case ChooseDifficulty:
     chooseDifficulty();
     break;
@@ -405,7 +423,15 @@ void loop()
     {
       playLength++;
       seqIndex = 0;
-      state = playLength > sequence.length() ? Win : PlaySequence;
+
+      if (playLength > sequence.length())
+      {
+        state = Win;
+      }
+      else
+      {
+        pause(1000, PlaySequence);
+      }
     }
     break;
   case Win:
