@@ -26,7 +26,7 @@ Green                 D4
 #include <jled.h>
 
 #include "led_multi_flash.h"
-#include "mario_fanfare.h"
+#include "melody_player.h"
 
 #define SPEAKER_PIN 12
 
@@ -72,7 +72,7 @@ Difficulty difficulty = None;
 
 LedMultiFlash multiFlash(3);
 
-MarioFanfare marioFanfare(SPEAKER_PIN);
+MelodyPlayer melodyPlayer(SPEAKER_PIN);
 
 JLed blueLeds = JLed(BLUE_LEDS);
 JLed yellowLeds = JLed(YELLOW_LEDS);
@@ -134,11 +134,12 @@ void pause(unsigned long mils, State stateAfter)
   state = Pause;
 }
 
-void playMelody(unsigned long pauseMilsAfter, State stateAfter)
+void playMelody(MelodyChoice melodyChoice, unsigned long pauseMilsAfter, State stateAfter)
 {
   pauseMilsAfterMelody = pauseMilsAfter;
   stateAfterMelody = stateAfter;
-  marioFanfare.startPlayback();
+  melodyPlayer.setMelodyChoice(melodyChoice);
+  melodyPlayer.startPlayback();
   state = PlayingMelody;
 }
 
@@ -197,7 +198,7 @@ void generateSequence()
   {
   case None:
   case Easy:
-    length = 2;
+    length = 8;
     break;
   case Medium:
     length = 16;
@@ -416,8 +417,8 @@ void loop()
     }
     break;
   case PlayingMelody:
-    marioFanfare.update();
-    if (marioFanfare.isStopped())
+    melodyPlayer.update();
+    if (melodyPlayer.isStopped())
     {
       pause(pauseMilsAfterMelody, stateAfterMelody);
     }
@@ -458,7 +459,7 @@ void loop()
     }
     break;
   case Win:
-    playMelody(1000, Initial);
+    playMelody(SuperMarioFanfare, 1000, Initial);
     break;
   case Fail:
     blueLeds.On();
