@@ -10,6 +10,7 @@
 
 enum MelodyChoice
 {
+  AngryBirdsIntro,
   SuperMarioFanfare,
   SuperMarioGameOver,
 };

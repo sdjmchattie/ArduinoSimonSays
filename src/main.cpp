@@ -47,8 +47,9 @@ Green                 D4
 
 enum State
 {
-  Pause,
+  PowerOn,
   Initial,
+  Pause,
   PlayingMelody,
   ChooseDifficulty,
   StartGame,
@@ -58,7 +59,7 @@ enum State
   Fail
 };
 
-State state = Initial;
+State state = PowerOn;
 
 enum Difficulty
 {
@@ -405,6 +406,9 @@ void loop()
 
   switch (state)
   {
+  case PowerOn:
+    playMelody(AngryBirdsIntro, 100, Initial);
+    break;
   case Initial:
     resetLeds();
     setDifficulty(None);

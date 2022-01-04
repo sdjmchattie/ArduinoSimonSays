@@ -6,10 +6,24 @@
 #include "melody_player.h"
 #include "notes.h"
 
+#define SEMI_QUAVER 1
+#define QUAVER 2
 #define CROTCHET 4
+#define CROTCHET_PLUS 6
 #define MINIM 8
 #define MINIM_PLUS 10
 #define SEMI_BREVE 16
+
+int angryBirdsIntroNotes[] = {
+    NOTE_E3, NOTE_FS3, NOTE_G3, NOTE_E3, NOTE_B3,
+    NOTE_E3, NOTE_FS3, NOTE_G3, NOTE_E3, NOTE_B3,
+    NOTE_B3, NOTE_C4, NOTE_B3, NOTE_A3, NOTE_G3,
+    NOTE_A3, NOTE_G3, NOTE_FS3, NOTE_E3};
+int angryBirdsIntroDurations[] = {
+    QUAVER, QUAVER, CROTCHET, CROTCHET, CROTCHET,
+    QUAVER, QUAVER, CROTCHET, CROTCHET, CROTCHET_PLUS,
+    QUAVER, QUAVER, QUAVER, QUAVER, QUAVER,
+    QUAVER, QUAVER, QUAVER, CROTCHET};
 
 int superMarioFanfareNotes[] = {
     NOTE_G3, NOTE_C4, NOTE_E4, NOTE_G4, NOTE_C5, NOTE_E5, NOTE_G5, NOTE_E5,
@@ -23,14 +37,26 @@ int superMarioFanfareDurations[] = {
     CROTCHET, CROTCHET, CROTCHET, SEMI_BREVE};
 
 int superMarioGameOverNotes[] = {
-    NOTE_C4, NOTE_G3, NOTE_E3, NOTE_A3, NOTE_B3, NOTE_A3, NOTE_GS3, NOTE_AS3, NOTE_GS3, NOTE_G3, NOTE_FS3, NOTE_G3};
+    NOTE_C4, NOTE_G3, NOTE_E3, NOTE_A3,
+    NOTE_B3, NOTE_A3, NOTE_GS3, NOTE_AS3,
+    NOTE_GS3, NOTE_G3, NOTE_FS3, NOTE_G3};
 int superMarioGameOverDurations[] = {
-    MINIM, MINIM, MINIM, CROTCHET, CROTCHET, CROTCHET, CROTCHET, CROTCHET, CROTCHET, 2, 2, SEMI_BREVE};
+    MINIM, MINIM, MINIM, CROTCHET,
+    CROTCHET, CROTCHET, CROTCHET, CROTCHET,
+    CROTCHET, QUAVER, QUAVER, SEMI_BREVE};
 
 void MelodyPlayer::setMelodyChoice(MelodyChoice melodyChoice)
 {
   switch (melodyChoice)
   {
+  case AngryBirdsIntro:
+    _melody = Melody(
+        _speakerPin,
+        angryBirdsIntroNotes,
+        angryBirdsIntroDurations,
+        sizeof(angryBirdsIntroNotes) / sizeof(angryBirdsIntroNotes[0]));
+    _melody.setTempo(15);
+    break;
   case SuperMarioFanfare:
     _melody = Melody(
         _speakerPin,
