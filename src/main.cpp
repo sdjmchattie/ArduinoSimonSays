@@ -26,6 +26,7 @@ Green                 D4
 #include <jled.h>
 
 #include "led_multi_flash.h"
+#include "mario_fanfare.h"
 
 #define SPEAKER_PIN 12
 
@@ -48,6 +49,7 @@ enum State
 {
   Pause,
   Initial,
+  PlayingMelody,
   ChooseDifficulty,
   StartGame,
   PlaySequence,
@@ -69,6 +71,8 @@ enum Difficulty
 Difficulty difficulty = None;
 
 LedMultiFlash multiFlash(3);
+
+MarioFanfare marioFanfare(SPEAKER_PIN);
 
 JLed blueLeds = JLed(BLUE_LEDS);
 JLed yellowLeds = JLed(YELLOW_LEDS);
@@ -96,8 +100,11 @@ uint8_t seqIndex;
 uint8_t playLength;
 unsigned long previousMils;
 
+State stateAfterMelody = Initial;
+unsigned long pauseMilsAfterMelody = 1000;
+
 State stateAfterPause = Initial;
-unsigned long pauseMils = 0;
+unsigned long pauseMils = 1000;
 
 void doUpdates()
 {
@@ -125,6 +132,14 @@ void pause(unsigned long mils, State stateAfter)
   stateAfterPause = stateAfter;
   pauseMils = mils;
   state = Pause;
+}
+
+void playMelody(unsigned long pauseMilsAfter, State stateAfter)
+{
+  pauseMilsAfterMelody = pauseMilsAfter;
+  stateAfterMelody = stateAfter;
+  marioFanfare.startPlayback();
+  state = PlayingMelody;
 }
 
 void setDifficulty(Difficulty newDifficulty)
@@ -182,7 +197,7 @@ void generateSequence()
   {
   case None:
   case Easy:
-    length = 8;
+    length = 2;
     break;
   case Medium:
     length = 16;
@@ -390,6 +405,7 @@ void loop()
   switch (state)
   {
   case Initial:
+    resetLeds();
     setDifficulty(None);
     state = ChooseDifficulty;
     break;
@@ -397,6 +413,13 @@ void loop()
     if (millis() - previousMils >= pauseMils)
     {
       state = stateAfterPause;
+    }
+    break;
+  case PlayingMelody:
+    marioFanfare.update();
+    if (marioFanfare.isStopped())
+    {
+      pause(pauseMilsAfterMelody, stateAfterMelody);
     }
     break;
   case ChooseDifficulty:
@@ -435,6 +458,7 @@ void loop()
     }
     break;
   case Win:
+    playMelody(1000, Initial);
     break;
   case Fail:
     blueLeds.On();

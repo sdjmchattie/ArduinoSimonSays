@@ -6,65 +6,53 @@
 #include "Arduino.h"
 #include "melody.h"
 
-enum MelodyState
-{
-  Stopped = 0,
-  StartNextNote = 1,
-  PlayingNote = 2,
-  PlayingGap = 3
-};
-
-bool isPlaying = false;
-MelodyState state = Stopped;
-int playPosition = 0;
-unsigned long previousMils = 0;
-
-int melodyLength;
-float millisPerDuration = 32.0;
-unsigned long noteGapMillis = 10.0;
-
 Melody::Melody(int speakerPin, int notes[], int durations[], int noteCount)
 {
-  melodyLength = noteCount;
+  _melodyLength = noteCount;
   _speakerPin = speakerPin;
   memcpy(_notes, notes, noteCount * sizeof(notes[0]));
   memcpy(_durations, durations, noteCount * sizeof(notes[0]));
 
-  pinMode(_speakerPin, OUTPUT);
+  _state = Stopped;
+  _previousMils = 0;
+  _isPlaying = false;
+  _playPosition = 0;
+
+  _millisPerDuration = 32.0;
+  _noteGapMillis = 10.0;
+
   noTone(_speakerPin);
 }
 
 void Melody::setTempo(float tempo)
 {
-  millisPerDuration = 1000 / tempo;
+  _millisPerDuration = 1000 / tempo;
 }
 
 void Melody::setNoteGaps(unsigned long millis)
 {
-  noteGapMillis = millis;
+  _noteGapMillis = millis;
 }
 
 void Melody::startPlayback()
 {
   noTone(_speakerPin);
-  playPosition = 0;
-  state = StartNextNote;
+  _playPosition = 0;
+  _state = StartNextNote;
 }
 
 void Melody::update()
 {
   unsigned long mils = millis();
 
-  switch (state)
+  switch (_state)
   {
   case Stopped:
-  {
     noTone(_speakerPin);
-  }
-  break;
+    break;
   case StartNextNote:
   {
-    int frequency = _notes[playPosition];
+    int frequency = _notes[_playPosition];
     if (frequency == 0)
     {
       // Pause instead of playing a note
@@ -73,39 +61,40 @@ void Melody::update()
     else
     {
       // Play the note of a given frequency
-      tone(_speakerPin, _notes[playPosition]);
+      tone(_speakerPin, _notes[_playPosition]);
     }
-    previousMils = mils;
-    state = PlayingNote;
+    _previousMils = mils;
+    _state = PlayingNote;
   }
   break;
   case PlayingNote:
-  {
-    if (mils - previousMils >= (unsigned long)(millisPerDuration * _durations[playPosition]))
+    if (mils - _previousMils >= (unsigned long)(_millisPerDuration * _durations[_playPosition]))
     {
-      if (playPosition == melodyLength - 1)
+      noTone(_speakerPin);
+      if (_playPosition == _melodyLength - 1)
       {
-        playPosition = 0;
-        state = Stopped;
+        _playPosition = 0;
+        _state = Stopped;
       }
       else
       {
-        noTone(_speakerPin);
-        previousMils = mils;
-        state = PlayingGap;
+        _previousMils = mils;
+        _state = PlayingGap;
       }
     }
-  }
-  break;
+    break;
   case PlayingGap:
-  {
-    if (mils - previousMils >= noteGapMillis)
+    if (mils - _previousMils >= _noteGapMillis)
     {
-      playPosition++;
-      previousMils = mils;
-      state = StartNextNote;
+      _playPosition++;
+      _previousMils = mils;
+      _state = StartNextNote;
     }
+    break;
   }
-  break;
-  }
+}
+
+bool Melody::isStopped()
+{
+  return _state == Stopped;
 }

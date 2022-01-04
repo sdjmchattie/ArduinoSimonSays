@@ -15,6 +15,7 @@ public:
   MarioFanfare() = default;
   void startPlayback();
   void update();
+  bool isStopped();
 
 private:
   Melody _marioFanfare;

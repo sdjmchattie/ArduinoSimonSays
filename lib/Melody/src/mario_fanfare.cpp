@@ -36,3 +36,8 @@ void MarioFanfare::update()
 {
   _marioFanfare.update();
 }
+
+bool MarioFanfare::isStopped()
+{
+  return _marioFanfare.isStopped();
+}
