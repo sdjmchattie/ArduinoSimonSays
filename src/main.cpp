@@ -374,9 +374,6 @@ void inputSequence()
 
 void setup()
 {
-  // Start serial connection to PC
-  Serial.begin(9600);
-
   // Set the speaker up
   pinMode(SPEAKER_PIN, OUTPUT);
   noTone(SPEAKER_PIN);
